@@ -1,0 +1,100 @@
+{
+  "name": "Test1",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO users (name, email)\nVALUES ($1, $2)\nON CONFLICT (email)\nDO UPDATE SET name = EXCLUDED.name\nRETURNING id, created_at;",
+        "options": {
+          "queryReplacement": "={{ [ $json.body.name, $json.body.email ] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -32,
+        -64
+      ],
+      "id": "e15ac086-22cb-4d55-b8f3-b0f6e4b0ea19",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "mysF2o3TbuxjIoTQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "create-user",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -352,
+        -64
+      ],
+      "id": "697853c4-5ded-4d05-b0b1-ed822b282917",
+      "name": "Webhook",
+      "webhookId": "b6c06420-bea0-47f7-a6e7-d58b6d6d14b2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"User created\",\n  \"id\": {{ $json.id }},\n  \"addedOn\": \"{{ $json.created_at }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        240,
+        -96
+      ],
+      "id": "d537b960-2ee4-4220-8b10-ebfe0a72393e",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0378a97f-5222-4bf7-b664-0441c46eee21",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1bde26f4d694057fe0611f073a2e2e0cb4f0961d306d5d585ec360a94ad4f003"
+  },
+  "id": "ga5bNmxj5pJE1RHG",
+  "tags": []
+}

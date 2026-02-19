@@ -1,0 +1,134 @@
+{
+  "name": "Webhook-Postgres-gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "create-user",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        -112
+      ],
+      "id": "697853c4-5ded-4d05-b0b1-ed822b282917",
+      "name": "Register",
+      "webhookId": "b6c06420-bea0-47f7-a6e7-d58b6d6d14b2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO users (name, email)\nVALUES ($1, $2)\nON CONFLICT (email)\nDO UPDATE SET name = EXCLUDED.name\nRETURNING id, created_at;",
+        "options": {
+          "queryReplacement": "={{ [ $json.body.name, $json.body.email ] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -208,
+        -112
+      ],
+      "id": "e15ac086-22cb-4d55-b8f3-b0f6e4b0ea19",
+      "name": "Save",
+      "credentials": {
+        "postgres": {
+          "id": "mysF2o3TbuxjIoTQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"User created\",\n  \"id\": {{ $json.id }},\n  \"addedOn\": \"{{ $json.created_at }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -16,
+        -112
+      ],
+      "id": "d537b960-2ee4-4220-8b10-ebfe0a72393e",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "sendTo": "soumstest26@gmail.com",
+        "subject": "={{ `Welcome ${$node[\"Register\"].json.body.name} 🎉` }}",
+        "message": "=Hi {{$node[\"Register\"].json.body.name}},\n\nYour account has been created successfully.\n\nUser ID: {{$node[\"Save\"].json.id}}\nCreated At: {{$node[\"Save\"].json.created_at}}\n\nThanks,\nn8n System\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        -112
+      ],
+      "id": "fdc5603e-b894-4262-b618-1c0a7ad7e9b0",
+      "name": "Welcome",
+      "webhookId": "6faca3a7-f00b-499f-9163-b84ac268f9c6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kCyXJ7nL4ijGrHzY",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Register": {
+      "main": [
+        [
+          {
+            "node": "Save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response": {
+      "main": [
+        [
+          {
+            "node": "Welcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "982a1e89-e2ae-46e4-b174-be441653d45c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1bde26f4d694057fe0611f073a2e2e0cb4f0961d306d5d585ec360a94ad4f003"
+  },
+  "id": "ga5bNmxj5pJE1RHG",
+  "tags": []
+}
