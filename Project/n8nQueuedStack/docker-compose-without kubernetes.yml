@@ -42,15 +42,6 @@ services:
       DB_POSTGRESDB_USER: n8n
       DB_POSTGRESDB_PASSWORD: n8n
 
-      # Role
-      N8N_ROLE: main
-
-      # webhook
-      WEBHOOK_URL: http://localhost:5678/
-
-      # shutdown
-      N8N_GRACEFUL_SHUTDOWN_TIMEOUT: 30
-
       # 🔹 Queue mode
       EXECUTIONS_MODE: queue
       QUEUE_BULL_REDIS_HOST: redis
@@ -79,11 +70,11 @@ services:
 
       OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS: "true"
 
-    # depends_on:
-    #   postgres:
-    #     condition: service_healthy
-    #   redis:
-    #     condition: service_healthy
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - n8n_data:/home/node/.n8n
 
@@ -100,12 +91,6 @@ services:
       DB_POSTGRESDB_USER: n8n
       DB_POSTGRESDB_PASSWORD: n8n
 
-      # Role
-      N8N_ROLE: worker
-
-      # shutdown
-      N8N_GRACEFUL_SHUTDOWN_TIMEOUT: 30
-      
       # 🔹 Queue mode
       EXECUTIONS_MODE: queue
       QUEUE_BULL_REDIS_HOST: redis
@@ -117,11 +102,11 @@ services:
       # encryption key
       N8N_ENCRYPTION_KEY: wTxbjyRmLoHVdUtZ7YVn3jS7o14nhNHL
 
-    # depends_on:
-    #   postgres:
-    #     condition: service_healthy
-    #   redis:
-    #     condition: service_healthy
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   postgres_data:
