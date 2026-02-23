@@ -16,11 +16,13 @@ export const options = {
 export default function () {
   const url = 'http://localhost:5678/webhook/create-user';
 
+  const uniqueId = `${__VU}_${__ITER}_${Date.now()}`;
+
   const payload = JSON.stringify({
-    userId: Math.floor(Math.random() * 100000),
-    ts: Date.now(),
-    source: 'k6'
+  	name: `user_${uniqueId}`,
+  	email: `user_${uniqueId}@email.com`
   });
+  
 
   const params = {
     headers: {
